@@ -57,7 +57,7 @@ right = false;
 
 
 function update() {
-    if (Math.random() < 1 - Math.pow(0.993, game.time.elapsedSince(gameStartTime)/1000 * 0.1)) {
+    if (Math.random() < 1 - Math.pow(0.993, game.time.elapsedSince(gameStartTime)/1000 * 0.5)) {
         rock = rocks.create(24 + Math.random() * (game.width - 48), -48, 'rock')
         rock.body.velocity.y = 200;
         rock.anchor.setTo(0.5, 0.5)
