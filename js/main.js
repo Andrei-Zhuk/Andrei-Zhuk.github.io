@@ -1,4 +1,4 @@
-var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+var game = new Phaser.Game(1024, 768, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
 function preload() {
     game.load.spritesheet('dude', 'assets/spritesheet.png', 80, 89);
@@ -67,7 +67,7 @@ function update() {
         if (player.animations.currentFrame.index === 0) {
             left = true
         }
-        player.body.velocity.x = -150;
+        player.body.velocity.x = -300;
         if (left) {
             player.frame = 0;
         } else {
@@ -77,7 +77,7 @@ function update() {
         if (player.animations.currentFrame.index === 8) {
             right = true
         }
-        player.body.velocity.x = 150;     
+        player.body.velocity.x = 300;     
         if (right) {
             player.frame = 8;
         } else {
@@ -91,9 +91,9 @@ function update() {
     }
 
     if (cursors.up.isDown) {
-        player.body.velocity.y = -200;
+        player.body.velocity.y = -300;
     } else if (cursors.down.isDown) {
-        player.body.velocity.y = 200;
+        player.body.velocity.y = 300;
     }
 }
 
