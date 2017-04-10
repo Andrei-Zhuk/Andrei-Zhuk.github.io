@@ -1,7 +1,7 @@
 var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
 function preload() {
-    game.load.audio('background_loop', 'assets/8bit-background_cut (online-audio-converter.com).mp3');
+    // game.load.spritesheet('player', 'assets/spritesheet.png', 80, 89);
     game.load.spritesheet('player', 'assets/player_1part.png', 28, 31);
     game.load.spritesheet('player2', 'assets/player_2part.png', 80, 49);
     game.load.spritesheet('explosion', 'assets/explosion.png', 64, 64);
@@ -14,16 +14,11 @@ function preload() {
     game.load.audio('player_explosion_sound', 'assets/explosion2.wav');
 }
 
-var player, backArr, currentFrame, weapon, fireButton, changeButton, rocks, rock, explosions, explosion, 
-explosionSound, scoreText, score, stateText, gameStartTime, fire, playerExplosion, playerExplosionSound, 
-shoot, shootType, backgroundTheme;
+var player, backArr, currentFrame, weapon, fireButton, rocks, rock, explosions, explosion, explosionSound, scoreText, score, 
+stateText, gameStartTime, fire, playerExplosion, playerExplosionSound, shoot;
 score = 0;
-shootType = 0;
 
 function create() {
-    backgroundTheme = game.add.audio('background_loop', 0.4, true);
-    backgroundTheme.play();
-
     gameStartTime = game.time.time;
     background = game.add.tileSprite(0, 0, 800, 600, 'background');
 
@@ -37,25 +32,6 @@ function create() {
     weapon.enableBody = true;
     weapon.onFire.add(function() {shoot.play()})
 
-    weaponP1 = game.add.weapon(40, 'bullet');
-    weaponP1.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
-    weaponP1.bulletSpeed = 500;
-    weaponP1.fireRate = 200;
-    weaponP1.bulletAngleOffset = 90;
-    weaponP1.fireAngle = 250;
-    weaponP1.enableBody = true;
-    weaponP1.onFire.add(function() {shoot.play()})
-
-    weaponP2 = game.add.weapon(40, 'bullet');
-    weaponP2.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
-    weaponP2.bulletSpeed = 500;
-    weaponP2.fireRate = 200;
-    weaponP2.bulletAngleOffset = 90;
-    weaponP2.fireAngle = 290;
-    weaponP2.enableBody = true;
-    weaponP2.onFire.add(a => shoot.play())
-
-
     rocks = game.add.group();
     rocks.enableBody = true;
     rocks.physicsBodyType = Phaser.Physics.ARCADE;
@@ -65,8 +41,6 @@ function create() {
 
     player = game.add.sprite(80, game.world.height - 150, 'player');
     weapon.trackSprite(player, 12, 0);
-    weaponP1.trackSprite(player, 12, 0);
-    weaponP2.trackSprite(player, 12, 0);
     game.physics.arcade.enable(player);
     player.body.collideWorldBounds = true;
     player.animations.add('left', [3, 2, 1, 0], 10, false);
@@ -80,17 +54,9 @@ function create() {
 
     cursors = game.input.keyboard.createCursorKeys();
     fireButton = game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
-    changeButton = game.input.keyboard.addKey(Phaser.KeyCode.SHIFT);
-
     fire = function(){
-        if (shootType % 2 === 0) {
-            weapon.fire();
-        } else {
-            weaponP1.fire();
-            weaponP2.fire();
-        }
+        weapon.fire();
     }
-
     shoot = game.add.audio('shoot')
     shoot.volume = 0.1;
 
@@ -118,6 +84,8 @@ function update() {
     if (Math.random() < 1 - Math.pow(0.993, game.time.elapsedSince(gameStartTime)/1000 * 0.5)) {
         rock = rocks.create(24 + Math.random() * (game.width - 48), -48, 'rock')
         rock.body.velocity.y = 200;
+        // rock.body.setCircle(24, 24, 24); 
+
     }
 
     background.tilePosition.y += 2;
@@ -130,11 +98,6 @@ function update() {
     if (fireButton.isDown) {
         fire();
     }
-
-    if (changeButton.isDown) {
-        shootType++
-    }
-
     if (cursors.left.isDown && player2.body.x != 0) {
         if (player.animations.currentFrame.index === 0) {
             left = true
@@ -179,8 +142,6 @@ function update() {
     }
 
     game.physics.arcade.overlap(weapon.bullets, rocks, explosionMaker, null, this);
-    game.physics.arcade.overlap(weaponP1.bullets, rocks, explosionMaker, null, this);
-    game.physics.arcade.overlap(weaponP2.bullets, rocks, explosionMaker, null, this);
     game.physics.arcade.overlap(player, rocks, deathMaker, null, this);
     game.physics.arcade.overlap(player2, rocks, deathMaker, null, this);
 }
@@ -210,7 +171,7 @@ function deathMaker(plr, rock) {
     
     fire = function(){}
 
-    stateText.text=` GAME OVER \n Your Score is: ${score} \n Click to restart`;
+    stateText.text=" GAME OVER \n Click to restart";
     stateText.visible = true;
 
     game.input.onTap.addOnce(restart,this);
@@ -229,12 +190,7 @@ function restart () {
     stateText.visible = false;
 
     fire = function(){
-        if (shootType % 2 === 0) {
-            weapon.fire();
-        } else {
-            weaponP1.fire();
-            weaponP2.fire();
-        }
+        weapon.fire();
     }
 
 }
