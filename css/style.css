@@ -2,7 +2,7 @@ body {
     margin: 0;
     text-align: center;
     font-size: 0px;
-    background: #012c72;
+    background: url("../assets/star_background.jpg");
     color: white;
 }
 
@@ -10,11 +10,13 @@ h1 {
     font-family: 'Concert One', cursive;
     font-size: 80px;
     letter-spacing: 0.1em;
+    margin: 45px 0;
 }
 
 #game {
 	display: inline-block;
 	position: relative;
+    margin-bottom: 45px;
 }
 .bar {
 	position: absolute;
@@ -38,7 +40,7 @@ h1 {
 }
 
 p {
-    margin-top: 50px;
+    margin-top: 18px;
     font-family: 'Raleway', sans-serif;
     font-size: 35px;
 }
