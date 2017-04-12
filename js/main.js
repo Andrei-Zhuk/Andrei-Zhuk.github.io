@@ -263,6 +263,7 @@ function deathMaker(plr, rock) {
     stateText.visible = true;
 
     timer.stop();
+    gameIsOn = false;
 
     game.input.onTap.addOnce(restart,this);
 }
@@ -292,7 +293,8 @@ function restart () {
         }
     }
     timer.loop(20000 + Math.random() * 10000, double, this);
-    timer.start()
+    timer.start();
+    gameIsOn = true;
 }
 
 function start() {
