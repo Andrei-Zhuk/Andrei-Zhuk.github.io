@@ -12,13 +12,19 @@ function preload() {
     game.load.audio('shoot', 'assets/shoot-5.wav');
     game.load.audio('explosion_sound', 'assets/explosion-4.wav');
     game.load.audio('player_explosion_sound', 'assets/explosion2.wav');
+    game.load.spritesheet('volume', 'assets/volume_sprite.png', 30, 30);
 }
 
 var player, backArr, currentFrame, weapon, fireButton, changeButton, rocks, rock, explosions, explosion, 
 explosionSound, scoreText, score, stateText, gameStartTime, fire, playerExplosion, playerExplosionSound, 
-shoot, shootType, backgroundTheme;
+shoot, shootType, backgroundTheme, shiftWasDown, volume, volumeButton, volumeMute;
 score = 0;
 shootType = 0;
+shiftWasDown = false;
+volumeMute = {
+    pressed: false,
+    count: 1
+}
 
 function create() {
     backgroundTheme = game.add.audio('background_loop', 0.4, true);
@@ -107,6 +113,11 @@ function create() {
     stateText = game.add.text(game.world.centerX,game.world.centerY,' ', { font: '84px Arial', fill: '#fff' });
     stateText.anchor.setTo(0.5, 0.5);
     stateText.visible = false;
+
+    volume = game.add.sprite(game.world.width - 40, 10, 'volume')
+    volume.frame = 1;
+
+    volumeButton = game.input.keyboard.addKey(Phaser.KeyCode.M);
 }
 
 var left, right, last;
@@ -115,6 +126,8 @@ right = false;
 
 
 function update() {
+    player.body.x = player2.body.x + 26;
+
     if (Math.random() < 1 - Math.pow(0.993, game.time.elapsedSince(gameStartTime)/1000 * 0.5)) {
         rock = rocks.create(24 + Math.random() * (game.width - 48), -48, 'rock')
         rock.body.velocity.y = 200;
@@ -132,7 +145,27 @@ function update() {
     }
 
     if (changeButton.isDown) {
-        shootType++
+        shiftWasDown = true;
+    }
+
+    if (changeButton.isUp && shiftWasDown) {
+        shiftWasDown = false;
+        shootType++;
+    }
+
+    if (volumeButton.isDown) {
+        volumeMute.pressed = true;
+    }
+
+    if (volumeButton.isUp && volumeMute.pressed) {
+        volumeMute.pressed = false;
+        volumeMute.count++;
+        volume.frame = volumeMute.count % 2;
+        if (volumeMute.count % 2 == 1) {
+            backgroundTheme.volume = 0.4;
+        } else {
+            backgroundTheme.volume = 0;
+        }
     }
 
     if (cursors.left.isDown && player2.body.x != 0) {
