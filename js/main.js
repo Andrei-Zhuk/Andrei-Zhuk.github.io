@@ -121,7 +121,7 @@ function create() {
     game.input.onTap.addOnce(start,this);
 
     timer = game.time.create(false);
-    timer.loop(40000 + Math.random() * 10000, double, this);
+    timer.loop(20000 + Math.random() * 10000, double, this);
 
     doubles = game.add.group();
     doubles.enableBody = true;
@@ -291,7 +291,7 @@ function restart () {
             weaponP2.fire();
         }
     }
-
+    timer.loop(20000 + Math.random() * 10000, double, this);
     timer.start()
 }
 
