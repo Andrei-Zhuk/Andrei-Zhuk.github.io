@@ -2,44 +2,14 @@
 <html lang="en"> 
 <head> 
     <meta charset="UTF-8" />
-    <title>Awesome game</title>
+    <title>Asteroids Hater</title>
+    <link href="https://fonts.googleapis.com/css?family=Concert+One|Raleway" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
     <script type="text/javascript" src="js/phaser.min.js"></script>
-    <style type="text/css">
-        body {
-            margin: 0;
-            text-align: center;
-            font-size: 0px;
-            background: #012c72;
-        }
-        #game {
-        	display: inline-block;
-        	position: relative;
-        }
-        .bar {
-        	position: absolute;
-        	right: -100px;
-        	top: 0;
-        	width: 100px;
-        	height: 600px;
-        	background: #161719; 
-        	color: white;
-        }
-        .score {
-        	font-size: 30px;
-        	margin-bottom: 100px;
-        }
-        .keys {
-        	color: #2f7efc;
-        	margin-top: 20px;
-        }
-        .instruction {
-        	font-size: 20px;
-        	margin-bottom: 25px;
-        }
-    </style>
     <script type="text/javascript" src="js/main.js"></script>
 </head>
 <body>
+	<h1>ASTEROIDS HATER</h1>
 	<div id="game">
 		<div class="bar">
 			<div class="score"> Best <br> Score: <br> <span id="best-score">0</span></div>
@@ -49,6 +19,9 @@
 			<div class="instruction"> Music on/off <br> with <br> <span class="keys">M</span></div>
 		</div>
 	</div>
-	
+	<p>Your task is to destroy as much asteroids as posiible.<br>
+		For every destroyed asteroid you get 10 points and if you catch 2x item, you get as twice as much. <br>
+		If any asteroid touches you, you'll be destroyed. <br>
+		Good luck and be careful, you have only one life.</p>	
 </body>
 </html>

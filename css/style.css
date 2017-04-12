@@ -1,0 +1,44 @@
+body {
+    margin: 0;
+    text-align: center;
+    font-size: 0px;
+    background: #012c72;
+    color: white;
+}
+
+h1 {
+    font-family: 'Concert One', cursive;
+    font-size: 80px;
+    letter-spacing: 0.1em;
+}
+
+#game {
+	display: inline-block;
+	position: relative;
+}
+.bar {
+	position: absolute;
+	right: -100px;
+	top: 0;
+	width: 100px;
+	height: 600px;
+	background: #161719; 
+}
+.score {
+	font-size: 30px;
+	margin-bottom: 100px;
+}
+.keys {
+	color: #2f7efc;
+	margin-top: 20px;
+}
+.instruction {
+	font-size: 20px;
+	margin-bottom: 25px;
+}
+
+p {
+    margin-top: 50px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 35px;
+}

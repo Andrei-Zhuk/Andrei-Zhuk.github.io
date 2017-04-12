@@ -13,11 +13,14 @@ function preload() {
     game.load.audio('explosion_sound', 'assets/explosion-4.wav');
     game.load.audio('player_explosion_sound', 'assets/explosion2.wav');
     game.load.spritesheet('volume', 'assets/volume_sprite.png', 30, 30);
+    game.load.image('double', 'assets/double.png');
+    game.load.audio('double', 'assets/double_sound.wav');
 }
 
 var player, backArr, currentFrame, weapon, fireButton, changeButton, rocks, rock, explosions, explosion, 
 explosionSound, scoreText, score, bestScore, stateText, gameStartTime, fire, playerExplosion, playerExplosionSound, 
-shoot, shootType, backgroundTheme, shiftWasDown, volume, volumeButton, volumeMute, gameIsOn, startText;
+shoot, shootType, backgroundTheme, shiftWasDown, volume, volumeButton, volumeMute, gameIsOn, startText, timer, 
+doubles, doublePic, doubleTimer, doubleSound, index;
 score = 0;
 shootType = 0;
 shiftWasDown = false;
@@ -25,7 +28,8 @@ volumeMute = {
     pressed: false,
     count: 1
 };
-gameIsOn = false
+gameIsOn = false;
+index = 1;
 
 function create() {
     bestScore = document.getElementById('best-score');
@@ -63,14 +67,10 @@ function create() {
     weaponP2.enableBody = true;
     weaponP2.onFire.add(a => shoot.play())
 
-
     rocks = game.add.group();
     rocks.enableBody = true;
     rocks.physicsBodyType = Phaser.Physics.ARCADE;
-
-
-    
-
+  
     player = game.add.sprite(80, game.world.height - 150, 'player');
     weapon.trackSprite(player, 12, 0);
     weaponP1.trackSprite(player, 12, 0);
@@ -91,7 +91,7 @@ function create() {
     changeButton = game.input.keyboard.addKey(Phaser.KeyCode.SHIFT);
 
     shoot = game.add.audio('shoot')
-    shoot.volume = 0.1;
+    shoot.volume = 0.2;
 
     explosions = game.add.group();
 
@@ -119,6 +119,19 @@ function create() {
     startText.anchor.setTo(0.5, 0.5);
     startText.text = "Click to start"
     game.input.onTap.addOnce(start,this);
+
+    timer = game.time.create(false);
+    timer.loop(40000 + Math.random() * 10000, double, this);
+
+    doubles = game.add.group();
+    doubles.enableBody = true;
+    doubles.physicsBodyType = Phaser.Physics.ARCADE;
+
+    doubleTimer = game.time.create();
+    doubleTimer.loop(10000, () => index = 1, this);
+
+    doubleSound = game.add.audio('double')
+    doubleSound.volume = 0.3;
 }
 
 var left, right, last;
@@ -217,10 +230,12 @@ function update() {
     game.physics.arcade.overlap(weaponP2.bullets, rocks, explosionMaker, null, this);
     game.physics.arcade.overlap(player, rocks, deathMaker, null, this);
     game.physics.arcade.overlap(player2, rocks, deathMaker, null, this);
+    game.physics.arcade.overlap(player, doubles, doubleEvent, null, this);
+    game.physics.arcade.overlap(player2, doubles, doubleEvent, null, this);
 }
 
 function explosionMaker (bullet, rock) {
-    score += 10;
+    score += 10 * index;
     scoreText.text = 'Score: '+ score;
     bullet.kill();
     rock.kill();
@@ -246,6 +261,8 @@ function deathMaker(plr, rock) {
 
     stateText.text=` GAME OVER \n Your Score is: ${score} \n Click to restart`;
     stateText.visible = true;
+
+    timer.stop();
 
     game.input.onTap.addOnce(restart,this);
 }
@@ -275,6 +292,7 @@ function restart () {
         }
     }
 
+    timer.start()
 }
 
 function start() {
@@ -292,4 +310,17 @@ function start() {
     player.revive();
     player2.revive();
     backgroundTheme.play();
+    timer.start();
+}
+
+function double() {
+    doublePic = doubles.create(40 + Math.random() * (game.width - 80), -48, 'double')
+    doublePic.body.velocity.y = 200;
+}
+
+function doubleEvent(plr, doublePic) {
+    doublePic.kill();
+    index = 2;
+    doubleTimer.start()
+    doubleSound.play();
 }
