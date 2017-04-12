@@ -1,4 +1,4 @@
-var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game', { preload: preload, create: create, update: update });
 
 function preload() {
     game.load.audio('background_loop', 'assets/8bit-background_cut (online-audio-converter.com).mp3');
@@ -16,19 +16,21 @@ function preload() {
 }
 
 var player, backArr, currentFrame, weapon, fireButton, changeButton, rocks, rock, explosions, explosion, 
-explosionSound, scoreText, score, stateText, gameStartTime, fire, playerExplosion, playerExplosionSound, 
-shoot, shootType, backgroundTheme, shiftWasDown, volume, volumeButton, volumeMute;
+explosionSound, scoreText, score, bestScore, stateText, gameStartTime, fire, playerExplosion, playerExplosionSound, 
+shoot, shootType, backgroundTheme, shiftWasDown, volume, volumeButton, volumeMute, gameIsOn, startText;
 score = 0;
 shootType = 0;
 shiftWasDown = false;
 volumeMute = {
     pressed: false,
     count: 1
-}
+};
+gameIsOn = false
 
 function create() {
+    bestScore = document.getElementById('best-score');
+
     backgroundTheme = game.add.audio('background_loop', 0.4, true);
-    backgroundTheme.play();
 
     gameStartTime = game.time.time;
     background = game.add.tileSprite(0, 0, 800, 600, 'background');
@@ -38,7 +40,7 @@ function create() {
     weapon = game.add.weapon(40, 'bullet');
     weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
     weapon.bulletSpeed = 500;
-    weapon.fireRate = 200;
+    weapon.fireRate = 150;
     weapon.bulletAngleOffset = 90;
     weapon.enableBody = true;
     weapon.onFire.add(function() {shoot.play()})
@@ -88,15 +90,6 @@ function create() {
     fireButton = game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
     changeButton = game.input.keyboard.addKey(Phaser.KeyCode.SHIFT);
 
-    fire = function(){
-        if (shootType % 2 === 0) {
-            weapon.fire();
-        } else {
-            weaponP1.fire();
-            weaponP2.fire();
-        }
-    }
-
     shoot = game.add.audio('shoot')
     shoot.volume = 0.1;
 
@@ -118,6 +111,14 @@ function create() {
     volume.frame = 1;
 
     volumeButton = game.input.keyboard.addKey(Phaser.KeyCode.M);
+
+    player.kill();
+    player2.kill();
+    fire = function(){}
+    startText = game.add.text(game.world.centerX,game.world.centerY,' ', { font: '84px Arial', fill: '#fff' });
+    startText.anchor.setTo(0.5, 0.5);
+    startText.text = "Click to start"
+    game.input.onTap.addOnce(start,this);
 }
 
 var left, right, last;
@@ -128,8 +129,8 @@ right = false;
 function update() {
     player.body.x = player2.body.x + 26;
 
-    if (Math.random() < 1 - Math.pow(0.993, game.time.elapsedSince(gameStartTime)/1000 * 0.5)) {
-        rock = rocks.create(24 + Math.random() * (game.width - 48), -48, 'rock')
+    if ((Math.random() < 1 - Math.pow(0.993, game.time.elapsedSince(gameStartTime)/1000 * 0.5)) && gameIsOn) {
+        rock = rocks.create(40 + Math.random() * (game.width - 80), -48, 'rock')
         rock.body.velocity.y = 200;
     }
 
@@ -255,6 +256,10 @@ function restart () {
     player.revive();
     player2.revive();
 
+    if (score > +bestScore.innerHTML) {
+        bestScore.innerHTML = score;
+    }
+
     score = 0;
     scoreText.text = 'Score: '+ score;
     gameStartTime = game.time.time;
@@ -270,4 +275,21 @@ function restart () {
         }
     }
 
+}
+
+function start() {
+    gameIsOn = true;
+    startText.visible = false;
+    fire = function(){
+        if (shootType % 2 === 0) {
+            weapon.fire();
+        } else {
+            weaponP1.fire();
+            weaponP2.fire();
+        }
+    }
+    gameStartTime = game.time.time;
+    player.revive();
+    player2.revive();
+    backgroundTheme.play();
 }

@@ -7,10 +7,48 @@
     <style type="text/css">
         body {
             margin: 0;
+            text-align: center;
+            font-size: 0px;
+            background: #012c72;
+        }
+        #game {
+        	display: inline-block;
+        	position: relative;
+        }
+        .bar {
+        	position: absolute;
+        	right: -100px;
+        	top: 0;
+        	width: 100px;
+        	height: 600px;
+        	background: #161719; 
+        	color: white;
+        }
+        .score {
+        	font-size: 30px;
+        	margin-bottom: 100px;
+        }
+        .keys {
+        	color: #2f7efc;
+        	margin-top: 20px;
+        }
+        .instruction {
+        	font-size: 20px;
+        	margin-bottom: 25px;
         }
     </style>
     <script type="text/javascript" src="js/main.js"></script>
 </head>
 <body>
+	<div id="game">
+		<div class="bar">
+			<div class="score"> Best <br> Score: <br> <span id="best-score">0</span></div>
+			<div class="instruction"> Move <br> with <br> <span class="keys">arrows</span></div>
+			<div class="instruction"> Shoot <br> with <br> <span class="keys">SPACE</span></div>
+			<div class="instruction"> Change <br> weapon <br> with <br> <span class="keys">SHIFT</span></div>
+			<div class="instruction"> Music on/off <br> with <br> <span class="keys">M</span></div>
+		</div>
+	</div>
+	
 </body>
 </html>
