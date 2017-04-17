@@ -20,16 +20,26 @@ h1 {
 }
 .bar {
 	position: absolute;
-	right: -100px;
+	right: -150px;
 	top: 0;
-	width: 100px;
-	height: 600px;
-	background: #161719; 
+	width: 150px;
+	height: 768px;
+	background: #161719;
 }
 .score {
 	font-size: 30px;
 	margin-bottom: 100px;
 }
+
+#health {
+    height: 20px;
+    width: 140px;
+    margin: 0 auto;
+    background: url('../assets/Health_sprite.png');
+    background-position: -420px 0;
+    margin-bottom: 50px;
+}
+
 .keys {
 	color: #2f7efc;
 	margin-top: 20px;

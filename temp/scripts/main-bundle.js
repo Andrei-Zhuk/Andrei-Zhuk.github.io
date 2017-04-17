@@ -70,7 +70,7 @@
 /* 0 */
 /***/ (function(module, exports) {
 
-var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game', { preload: preload, create: create, update: update });
+var game = new Phaser.Game(1024, 768, Phaser.AUTO, 'game', { preload: preload, create: create, update: update });
 
 function preload() {
     game.load.audio('background_loop', 'assets/8bit-background_cut (online-audio-converter.com).mp3');
@@ -78,10 +78,12 @@ function preload() {
     game.load.spritesheet('player2', 'assets/player_2part.png', 80, 49);
     game.load.spritesheet('explosion', 'assets/explosion.png', 64, 64);
     game.load.spritesheet('player_explosion', 'assets/exp2_0.png', 64, 64);
-    game.load.image('background', 'assets/back_800x600.png');
+    game.load.image('background', 'assets/space-1.png');
     game.load.image('bullet', 'assets/bullet_1.png');
     game.load.image('bullet_2', 'assets/bullet_2.png');
     game.load.image('rock', 'assets/rock.png');
+    game.load.image('alien-scout', 'assets/5B.png');
+    game.load.image('alien-scout-bullet', 'assets/alien-scout-bullet.png');
     game.load.audio('shoot', 'assets/shoot-5.wav');
     game.load.audio('explosion_sound', 'assets/explosion-4.wav');
     game.load.audio('player_explosion_sound', 'assets/explosion2.wav');
@@ -93,7 +95,7 @@ function preload() {
 var player, backArr, currentFrame, weapon, rocks, rock, explosions, explosion,
 explosionSound, scoreText, score, bestScore, stateText, gameStartTime,
 backgroundTheme, volume, volumeButton, volumeMute, gameIsOn,
-startText, timer, doubles, doublePic, doubleTimer, doubleSound, index, tween;
+startText, timer, doubles, doublePic, doubleTimer, doubleSound, index, tween, aliens;
 score = 0;
 volumeMute = {
     pressed: false,
@@ -107,6 +109,8 @@ weapon = {};
 weapon.double = {};
 weapon.changeButtonDown = false;
 weapon.type = 0;
+aliens = {};
+aliens.scouts = {};
 
 function create() {
     bestScore = document.getElementById('best-score');
@@ -114,7 +118,7 @@ function create() {
     backgroundTheme = game.add.audio('background_loop', 0.4, true);
 
     gameStartTime = game.time.time;
-    background = game.add.tileSprite(0, 0, 800, 600, 'background');
+    background = game.add.tileSprite(0, 0, 1024, 768, 'background');
 
     game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -158,6 +162,20 @@ function create() {
     rocks.enableBody = true;
     rocks.physicsBodyType = Phaser.Physics.ARCADE;
 
+    aliens.scouts.group = game.add.group();
+    aliens.scouts.group.enableBody = true;
+    aliens.scouts.group.physicsBodyType = Phaser.Physics.ARCADE;
+    aliens.scouts.reloadTime = 1000;
+
+    aliens.scouts.weapon = game.add.weapon(-1, 'alien-scout-bullet');
+    aliens.scouts.weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
+    aliens.scouts.weapon.bulletSpeed = 500;
+    aliens.scouts.weapon.fireRate = 0;
+    aliens.scouts.weapon.bulletAngleOffset = 90;
+    aliens.scouts.weapon.enableBody = true;
+    aliens.scouts.weapon.fireAngle = 90;
+    // aliens.scouts.weapon.onFire.add(a => weapon.sound.play())
+
     player.part1 = game.add.sprite(80, game.world.height - 150, 'player');
     weapon.single.trackSprite(player.part1, 12, 0);
     weapon.double.part1.trackSprite(player.part1, 12, 0);
@@ -173,6 +191,9 @@ function create() {
     player.part2.body.collideWorldBounds = true;
     player.part2.animations.add('left', [3, 2, 1, 0], 10, false);
     player.part2.animations.add('right', [5, 6, 7, 8], 10, false);
+
+    player.lifes = 3;
+    player.health = document.getElementById('health');
 
     cursors = game.input.keyboard.createCursorKeys();
     weapon.fireButton = game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
@@ -233,6 +254,24 @@ function update() {
         rock.body.velocity.y = 200;
         rock.startPointX = rock.body.x;
     }
+
+    // if ((Math.random() < 1 - 0.98) && gameIsOn) {
+    //     aliens.scouts.single = aliens.scouts.group.create(50 + Math.random() * (game.width - 100), -100, 'alien-scout')
+    //     aliens.scouts.single.body.velocity.y = 200;
+    //     aliens.scouts.single.startTime = game.time.time;
+    //     aliens.scouts.single.currentLifes = 2;
+    // }
+    //
+    // aliens.scouts.group.forEachAlive(function(i) {
+    //     if (i.body.y >= game.height + 79) {
+    //         i.kill();
+    //     } else if (game.time.elapsedSince(i.startTime) >= aliens.scouts.reloadTime){
+    //         i.startTime = game.time.time;
+    //         aliens.scouts.weapon.trackSprite(i, 24, 79);
+    //         aliens.scouts.weapon.fire();
+    //     }
+    // })
+
 
     background.tilePosition.y += 2;
 
@@ -313,10 +352,16 @@ function update() {
     game.physics.arcade.overlap(weapon.double.part1.bullets, rocks, explosionMaker, null, this);
     game.physics.arcade.overlap(weapon.double.part2.bullets, rocks, explosionMaker, null, this);
     game.physics.arcade.overlap(weapon.big.bullets, rocks, bigExplosionMaker, null, this);
+
     game.physics.arcade.overlap(player.part1, rocks, deathMaker, null, this);
     game.physics.arcade.overlap(player.part2, rocks, deathMaker, null, this);
     game.physics.arcade.overlap(player.part1, doubles, doubleEvent, null, this);
     game.physics.arcade.overlap(player.part2, doubles, doubleEvent, null, this);
+
+    game.physics.arcade.overlap(weapon.single.bullets, aliens.scouts.group, alienBulletHit, null, this);
+    game.physics.arcade.overlap(weapon.double.part1.bullets, aliens.scouts.group, alienBulletHit, null, this);
+    game.physics.arcade.overlap(weapon.double.part2.bullets, aliens.scouts.group, alienBulletHit, null, this);
+    game.physics.arcade.overlap(weapon.big.bullets, aliens.scouts.group, bigExplosionMaker, null, this);
 }
 
 function explosionMaker (bullet, rock) {
@@ -350,24 +395,38 @@ function bigExplosionMaker(bullet, rock) {
 }
 
 function deathMaker(plr, rock) {
-    player.part1.kill();
-    player.part2.kill();
+    player.lifes--;
+    player.health.style.backgroundPositionX = `${-140 * player.lifes}px`;
 
-    player.explosion.sound.play()
+    rock.kill();
 
-    player.explosion.sprite = player.explosions.create(plr.body.x - 10, plr.body.y - 10, 'player_explosion');
-    player.explosion.sprite.animations.add('boom');
-    player.explosion.sprite.play('boom', 30, false, true)
+    explosion = explosions.create(rock.body.x, rock.body.y, 'explosion');
+    explosion.animations.add('boom');
+    explosion.anchor.setTo(0.1, 0.1);
+    explosion.play('boom', 30, false, true);
 
-    weapon.fire = function(){}
+    explosionSound.play();
 
-    stateText.text=` GAME OVER \n Your Score is: ${score} \n Click to restart`;
-    stateText.visible = true;
+    if (player.lifes === 0) {
+        player.part1.kill();
+        player.part2.kill();
 
-    timer.stop();
-    gameIsOn = false;
+        player.explosion.sound.play()
 
-    game.input.onTap.addOnce(restart,this);
+        player.explosion.sprite = player.explosions.create(plr.body.x - 10, plr.body.y - 10, 'player_explosion');
+        player.explosion.sprite.animations.add('boom');
+        player.explosion.sprite.play('boom', 30, false, true)
+
+        weapon.fire = function(){}
+
+        stateText.text=` GAME OVER \n Your Score is: ${score} \n Click to restart`;
+        stateText.visible = true;
+
+        timer.stop();
+        gameIsOn = false;
+
+        game.input.onTap.addOnce(restart,this);
+    }
 }
 
 function restart () {
@@ -375,6 +434,9 @@ function restart () {
 
     player.part1.revive();
     player.part2.revive();
+
+    player.lifes = 3;
+    player.health.style.backgroundPositionX = `${-140 * player.lifes}px`;
 
     if (score > +bestScore.innerHTML) {
         bestScore.innerHTML = score;
@@ -431,6 +493,21 @@ function doubleEvent(plr, doublePic) {
     index = 2;
     doubleTimer.start()
     doubleSound.play();
+}
+
+function alienBulletHit(bullet, scout) {
+    bullet.kill();
+    scout.currentLifes--;
+    if (scout.currentLifes === 0) {
+        scout.kill();
+        score += 20 * index;
+        scoreText.text = 'Score: '+ score;
+        explosionSound.play();
+        explosion = explosions.create(scout.body.x, scout.body.y, 'explosion');
+        explosion.animations.add('boom')
+        explosion.anchor.setTo(0.1, 0.1)
+        explosion.play('boom', 30, false, true)
+    }
 }
 
 
