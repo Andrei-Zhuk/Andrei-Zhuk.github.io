@@ -68,7 +68,10 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 var game = new Phaser.Game(1024, 768, Phaser.AUTO, 'game', { preload: preload, create: create, update: update });
 
@@ -92,10 +95,7 @@ function preload() {
     game.load.audio('double', 'assets/double_sound.wav');
 }
 
-var player, backArr, currentFrame, weapon, rocks, rock, explosions, explosion,
-explosionSound, scoreText, score, bestScore, stateText, gameStartTime,
-backgroundTheme, volume, volumeButton, volumeMute, gameIsOn,
-startText, timer, doubles, doublePic, doubleTimer, doubleSound, index, tween, aliens;
+var player, background, currentFrame, weapon, rocks, rock, explosions, explosion, explosionSound, scoreText, score, bestScore, stateText, gameStartTime, backgroundTheme, volume, volumeButton, volumeMute, gameIsOn, startText, timer, doubles, doublePic, doubleTimer, doubleSound, index, tween, aliens, cursors, stage;
 score = 0;
 volumeMute = {
     pressed: false,
@@ -111,6 +111,7 @@ weapon.changeButtonDown = false;
 weapon.type = 0;
 aliens = {};
 aliens.scouts = {};
+stage = 1;
 
 function create() {
     bestScore = document.getElementById('best-score');
@@ -128,7 +129,9 @@ function create() {
     weapon.single.fireRate = 200;
     weapon.single.bulletAngleOffset = 90;
     weapon.single.enableBody = true;
-    weapon.single.onFire.add(a => weapon.sound.play())
+    weapon.single.onFire.add(function (a) {
+        return weapon.sound.play();
+    });
 
     weapon.double.part1 = game.add.weapon(-1, 'bullet');
     weapon.double.part1.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
@@ -137,7 +140,9 @@ function create() {
     weapon.double.part1.bulletAngleOffset = 90;
     weapon.double.part1.fireAngle = 250;
     weapon.double.part1.enableBody = true;
-    weapon.double.part1.onFire.add(a => weapon.sound.play())
+    weapon.double.part1.onFire.add(function (a) {
+        return weapon.sound.play();
+    });
 
     weapon.double.part2 = game.add.weapon(-1, 'bullet');
     weapon.double.part2.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
@@ -146,7 +151,9 @@ function create() {
     weapon.double.part2.bulletAngleOffset = 90;
     weapon.double.part2.fireAngle = 290;
     weapon.double.part2.enableBody = true;
-    weapon.double.part2.onFire.add(a => weapon.sound.play())
+    weapon.double.part2.onFire.add(function (a) {
+        return weapon.sound.play();
+    });
 
     weapon.big = game.add.weapon(-1, 'bullet_2');
     weapon.big.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
@@ -154,9 +161,10 @@ function create() {
     weapon.big.fireRate = 2000;
     weapon.big.bulletAngleOffset = 90;
     weapon.big.enableBody = true;
-    weapon.big.onFire.add(a => weapon.sound.play())
+    weapon.big.onFire.add(function (a) {
+        return weapon.sound.play();
+    });
     weapon.radius = 200;
-
 
     rocks = game.add.group();
     rocks.enableBody = true;
@@ -165,7 +173,7 @@ function create() {
     aliens.scouts.group = game.add.group();
     aliens.scouts.group.enableBody = true;
     aliens.scouts.group.physicsBodyType = Phaser.Physics.ARCADE;
-    aliens.scouts.reloadTime = 1000;
+    aliens.scouts.reloadTime = 2000;
 
     aliens.scouts.weapon = game.add.weapon(-1, 'alien-scout-bullet');
     aliens.scouts.weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
@@ -199,7 +207,7 @@ function create() {
     weapon.fireButton = game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
     weapon.changeButton = game.input.keyboard.addKey(Phaser.KeyCode.SHIFT);
 
-    weapon.sound = game.add.audio('shoot')
+    weapon.sound = game.add.audio('shoot');
     weapon.sound.volume = 0.2;
 
     explosions = game.add.group();
@@ -212,22 +220,22 @@ function create() {
 
     scoreText = game.add.text(10, 10, 'Score: ' + score, { font: '24px Arial', fill: '#fff' });
 
-    stateText = game.add.text(game.world.centerX,game.world.centerY,' ', { font: '84px Arial', fill: '#fff' });
+    stateText = game.add.text(game.world.centerX, game.world.centerY, ' ', { font: '84px Arial', fill: '#fff' });
     stateText.anchor.setTo(0.5, 0.5);
     stateText.visible = false;
 
-    volume = game.add.sprite(game.world.width - 40, 10, 'volume')
+    volume = game.add.sprite(game.world.width - 40, 10, 'volume');
     volume.frame = 1;
 
     volumeButton = game.input.keyboard.addKey(Phaser.KeyCode.M);
 
     player.part1.kill();
     player.part2.kill();
-    weapon.fire = function(){}
-    startText = game.add.text(game.world.centerX,game.world.centerY,' ', { font: '84px Arial', fill: '#fff' });
+    weapon.fire = function () {};
+    startText = game.add.text(game.world.centerX, game.world.centerY, ' ', { font: '84px Arial', fill: '#fff' });
     startText.anchor.setTo(0.5, 0.5);
-    startText.text = "Click to start"
-    game.input.onTap.addOnce(start,this);
+    startText.text = "Click to start";
+    game.input.onTap.addOnce(start, this);
 
     timer = game.time.create(false);
     timer.loop(20000 + Math.random() * 10000, double, this);
@@ -237,41 +245,46 @@ function create() {
     doubles.physicsBodyType = Phaser.Physics.ARCADE;
 
     doubleTimer = game.time.create();
-    doubleTimer.loop(10000, () => index = 1, this);
+    doubleTimer.loop(10000, function () {
+        return index = 1;
+    }, this);
 
-    doubleSound = game.add.audio('double')
+    doubleSound = game.add.audio('double');
     doubleSound.volume = 0.3;
 }
 
 player.left = false;
 player.right = false;
 
-
 function update() {
-    rocks.forEachAlive(function(i) {i.body.x = i.startPointX + Math.sin(i.body.y * 3.14 / 180) * 10 * game.time.elapsedSince(gameStartTime)/30000})
-    if ((Math.random() < 1 - Math.pow(0.993, game.time.elapsedSince(gameStartTime)/1000 * 0.5)) && gameIsOn) {
-        rock = rocks.create(40 + Math.random() * (game.width - 80), -47, 'rock')
+    if (score >= 2000) {
+        stage = 2;
+    }
+    rocks.forEachAlive(function (i) {
+        i.body.x = i.startPointX + Math.sin(i.body.y * 3.14 / 180) * 10 * game.time.elapsedSince(gameStartTime) / 30000;
+    });
+    if (Math.random() < 1 - Math.pow(0.993, game.time.elapsedSince(gameStartTime) / 1000 * 0.5) && gameIsOn && stage === 1) {
+        rock = rocks.create(40 + Math.random() * (game.width - 80), -47, 'rock');
         rock.body.velocity.y = 200;
         rock.startPointX = rock.body.x;
     }
 
-    // if ((Math.random() < 1 - 0.98) && gameIsOn) {
-    //     aliens.scouts.single = aliens.scouts.group.create(50 + Math.random() * (game.width - 100), -100, 'alien-scout')
-    //     aliens.scouts.single.body.velocity.y = 200;
-    //     aliens.scouts.single.startTime = game.time.time;
-    //     aliens.scouts.single.currentLifes = 2;
-    // }
-    //
-    // aliens.scouts.group.forEachAlive(function(i) {
-    //     if (i.body.y >= game.height + 79) {
-    //         i.kill();
-    //     } else if (game.time.elapsedSince(i.startTime) >= aliens.scouts.reloadTime){
-    //         i.startTime = game.time.time;
-    //         aliens.scouts.weapon.trackSprite(i, 24, 79);
-    //         aliens.scouts.weapon.fire();
-    //     }
-    // })
+    if (Math.random() < 1 - 0.99 && gameIsOn && stage === 2) {
+        aliens.scouts.single = aliens.scouts.group.create(50 + Math.random() * (game.width - 100), -100, 'alien-scout');
+        aliens.scouts.single.body.velocity.y = 50;
+        aliens.scouts.single.startTime = game.time.time;
+        aliens.scouts.single.currentLifes = 2;
+    }
 
+    aliens.scouts.group.forEachAlive(function (i) {
+        if (i.body.y >= game.height + 79) {
+            i.kill();
+        } else if (game.time.elapsedSince(i.startTime) >= aliens.scouts.reloadTime && gameIsOn) {
+            i.startTime = game.time.time;
+            aliens.scouts.weapon.trackSprite(i, 24, 79);
+            aliens.scouts.weapon.fire();
+        }
+    });
 
     background.tilePosition.y += 2;
 
@@ -311,7 +324,7 @@ function update() {
 
     if (cursors.left.isDown && player.part2.body.x != 0) {
         if (player.part1.animations.currentFrame.index === 0) {
-            player.left = true
+            player.left = true;
         }
         player.part2.body.velocity.x = -300;
         if (player.left) {
@@ -323,7 +336,7 @@ function update() {
         }
     } else if (cursors.right.isDown && player.part2.body.x != game.world.width - 80) {
         if (player.part1.animations.currentFrame.index === 8) {
-            player.right = true
+            player.right = true;
         }
         player.part2.body.velocity.x = 300;
         if (player.right) {
@@ -361,26 +374,28 @@ function update() {
     game.physics.arcade.overlap(weapon.single.bullets, aliens.scouts.group, alienBulletHit, null, this);
     game.physics.arcade.overlap(weapon.double.part1.bullets, aliens.scouts.group, alienBulletHit, null, this);
     game.physics.arcade.overlap(weapon.double.part2.bullets, aliens.scouts.group, alienBulletHit, null, this);
-    game.physics.arcade.overlap(weapon.big.bullets, aliens.scouts.group, bigExplosionMaker, null, this);
+    game.physics.arcade.overlap(weapon.big.bullets, aliens.scouts.group, bigBulletHitAlien, null, this);
+
+    game.physics.arcade.overlap(player.part1, aliens.scouts.weapon.bullets, bulletHitPlayer, null, this);
+    game.physics.arcade.overlap(player.part2, aliens.scouts.weapon.bullets, bulletHitPlayer, null, this);
 }
 
-function explosionMaker (bullet, rock) {
+function explosionMaker(bullet, rock) {
     score += 10 * index;
-    scoreText.text = 'Score: '+ score;
+    scoreText.text = 'Score: ' + score;
     bullet.kill();
     rock.kill();
     explosionSound.play();
     explosion = explosions.create(rock.body.x, rock.body.y, 'explosion');
-    explosion.animations.add('boom')
-    explosion.anchor.setTo(0.1, 0.1)
-    explosion.play('boom', 30, false, true)
-
+    explosion.animations.add('boom');
+    explosion.anchor.setTo(0.1, 0.1);
+    explosion.play('boom', 30, false, true);
 }
 
 function bigExplosionMaker(bullet, rock) {
     rocks.forEachAlive(function (i) {
-        if (Math.sqrt(Math.pow((i.body.x - rock.body.x), 2) + Math.pow((i.body.y - rock.body.y), 2)) <= weapon.radius) {
-            i.kill()
+        if (Math.sqrt(Math.pow(i.body.x - rock.body.x, 2) + Math.pow(i.body.y - rock.body.y, 2)) <= weapon.radius) {
+            i.kill();
             explosion = explosions.create(i.body.x, i.body.y, 'explosion');
             explosion.animations.add('boom');
             explosion.anchor.setTo(0.1, 0.1);
@@ -391,12 +406,12 @@ function bigExplosionMaker(bullet, rock) {
     bullet.kill();
     rock.kill();
     explosionSound.play();
-    scoreText.text = 'Score: '+ score;
+    scoreText.text = 'Score: ' + score;
 }
 
 function deathMaker(plr, rock) {
     player.lifes--;
-    player.health.style.backgroundPositionX = `${-140 * player.lifes}px`;
+    player.health.style.backgroundPositionX = -140 * player.lifes + 'px';
 
     rock.kill();
 
@@ -411,71 +426,73 @@ function deathMaker(plr, rock) {
         player.part1.kill();
         player.part2.kill();
 
-        player.explosion.sound.play()
+        player.explosion.sound.play();
 
         player.explosion.sprite = player.explosions.create(plr.body.x - 10, plr.body.y - 10, 'player_explosion');
         player.explosion.sprite.animations.add('boom');
-        player.explosion.sprite.play('boom', 30, false, true)
+        player.explosion.sprite.play('boom', 30, false, true);
 
-        weapon.fire = function(){}
+        weapon.fire = function () {};
 
-        stateText.text=` GAME OVER \n Your Score is: ${score} \n Click to restart`;
+        stateText.text = ' GAME OVER \n Your Score is: ' + score + ' \n Click to restart';
         stateText.visible = true;
 
         timer.stop();
         gameIsOn = false;
 
-        game.input.onTap.addOnce(restart,this);
+        game.input.onTap.addOnce(restart, this);
     }
 }
 
-function restart () {
+function restart() {
     rocks.removeAll();
+    aliens.scouts.group.removeAll();
 
     player.part1.revive();
     player.part2.revive();
 
     player.lifes = 3;
-    player.health.style.backgroundPositionX = `${-140 * player.lifes}px`;
+    player.health.style.backgroundPositionX = -140 * player.lifes + 'px';
 
     if (score > +bestScore.innerHTML) {
         bestScore.innerHTML = score;
     }
 
     score = 0;
-    scoreText.text = 'Score: '+ score;
+    scoreText.text = 'Score: ' + score;
     gameStartTime = game.time.time;
 
     stateText.visible = false;
 
-    weapon.fire = function(){
+    weapon.fire = function () {
         if (weapon.type % 3 === 0) {
             weapon.single.fire();
-        } else if(weapon.type % 3 === 1){
+        } else if (weapon.type % 3 === 1) {
             weapon.double.part1.fire();
             weapon.double.part2.fire();
         } else {
-            weapon.big.fire()
+            weapon.big.fire();
         }
-    }
+    };
     timer.loop(20000 + Math.random() * 10000, double, this);
     timer.start();
     gameIsOn = true;
+    stage = 1;
 }
 
 function start() {
     gameIsOn = true;
     startText.visible = false;
-    weapon.fire = function(){
+    weapon.fire = function () {
         if (weapon.type % 3 === 0) {
             weapon.single.fire();
-        } else if(weapon.type % 3 === 1){
+        } else if (weapon.type % 3 === 1) {
             weapon.double.part1.fire();
             weapon.double.part2.fire();
         } else {
-            weapon.big.fire()
+            weapon.big.fire();
         }
-    }
+    };
     gameStartTime = game.time.time;
     player.part1.revive();
     player.part2.revive();
@@ -484,14 +501,14 @@ function start() {
 }
 
 function double() {
-    doublePic = doubles.create(40 + Math.random() * (game.width - 80), -48, 'double')
+    doublePic = doubles.create(40 + Math.random() * (game.width - 80), -48, 'double');
     doublePic.body.velocity.y = 200;
 }
 
 function doubleEvent(plr, doublePic) {
     doublePic.kill();
     index = 2;
-    doubleTimer.start()
+    doubleTimer.start();
     doubleSound.play();
 }
 
@@ -501,15 +518,65 @@ function alienBulletHit(bullet, scout) {
     if (scout.currentLifes === 0) {
         scout.kill();
         score += 20 * index;
-        scoreText.text = 'Score: '+ score;
-        explosionSound.play();
+        scoreText.text = 'Score: ' + score;
+        explosionSound.play('', 0, 1);
         explosion = explosions.create(scout.body.x, scout.body.y, 'explosion');
-        explosion.animations.add('boom')
-        explosion.anchor.setTo(0.1, 0.1)
-        explosion.play('boom', 30, false, true)
+        explosion.animations.add('boom');
+        explosion.anchor.setTo(0.1, 0.1);
+        explosion.play('boom', 30, false, true);
+    } else {
+        explosion = explosions.create(bullet.body.x, bullet.body.y, 'explosion');
+        explosion.animations.add('boom');
+        explosion.scale.setTo(0.5, 0.5);
+        explosion.play('boom', 30, false, true);
+        explosionSound.play('', 0, 0.3);
     }
 }
 
+function bulletHitPlayer(plr, bullet) {
+    player.lifes--;
+    player.health.style.backgroundPositionX = -140 * player.lifes + 'px';
+
+    bullet.kill();
+
+    if (player.lifes === 0) {
+        player.part1.kill();
+        player.part2.kill();
+
+        player.explosion.sound.play();
+
+        player.explosion.sprite = player.explosions.create(plr.body.x - 10, plr.body.y - 10, 'player_explosion');
+        player.explosion.sprite.animations.add('boom');
+        player.explosion.sprite.play('boom', 30, false, true);
+
+        weapon.fire = function () {};
+
+        stateText.text = ' GAME OVER \n Your Score is: ' + score + ' \n Click to restart';
+        stateText.visible = true;
+
+        timer.stop();
+        gameIsOn = false;
+
+        game.input.onTap.addOnce(restart, this);
+    }
+}
+
+function bigBulletHitAlien(bullet, scout) {
+    aliens.scouts.group.forEachAlive(function (i) {
+        if (Math.sqrt(Math.pow(i.body.x - scout.body.x, 2) + Math.pow(i.body.y - scout.body.y, 2)) <= weapon.radius) {
+            i.kill();
+            explosion = explosions.create(i.body.x, i.body.y, 'explosion');
+            explosion.animations.add('boom');
+            explosion.anchor.setTo(0.1, 0.1);
+            explosion.play('boom', 30, false, true);
+            score += 20 * index;
+        }
+    });
+    bullet.kill();
+    scout.kill();
+    explosionSound.play();
+    scoreText.text = 'Score: ' + score;
+}
 
 /***/ })
 /******/ ]);
