@@ -209,7 +209,7 @@ function update() {
 
     if ((Math.random() < 1 - 0.98) && gameIsOn && stage >= 2) {
         aliens.scouts.single = aliens.scouts.group.create(50 + Math.random() * (game.width - 100), -100, 'alien-scout')
-        aliens.scouts.single.body.velocity.y = 250;
+        aliens.scouts.single.body.velocity.y = 150;
         aliens.scouts.single.startTime = game.time.time;
         aliens.scouts.single.currentLifes = 2;
     }
@@ -226,7 +226,7 @@ function update() {
 
     if ((Math.random() < 1 - 0.99) && gameIsOn && stage == 3) {
         aliens.bombers.single = aliens.bombers.group.create(70 + Math.random() * (game.width - 140), -62, 'alien-bomber')
-        aliens.bombers.single.body.velocity.y = 100;
+        aliens.bombers.single.body.velocity.y = 80;
         aliens.bombers.single.startTime = game.time.time;
         aliens.bombers.single.currentLifes = 3;
         aliens.bombers.single.startPointX = aliens.bombers.single.body.x
