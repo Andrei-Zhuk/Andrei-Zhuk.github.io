@@ -110,6 +110,7 @@ weapon = {};
 weapon.double = {};
 weapon.changeButtonDown = false;
 weapon.type = 0;
+weapon.buttons = {};
 aliens = {};
 aliens.scouts = {};
 aliens.bombers = {};
@@ -221,6 +222,33 @@ function create() {
     cursors = game.input.keyboard.createCursorKeys();
     weapon.fireButton = game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
     weapon.changeButton = game.input.keyboard.addKey(Phaser.KeyCode.SHIFT);
+    weapon.changeButton.onDown.add(function () {
+        document.getElementById(weapon.ids[weapon.type]).style.boxShadow = '';
+        weapon.type = weapon.type + 1 == 3 ? 0 : weapon.type + 1;
+        document.getElementById(weapon.ids[weapon.type]).style.boxShadow = '0px 0px 10px 0px rgba(23,194,8,1)';
+    }, this);
+
+    weapon.ids = ['single', 'double', 'big'];
+    document.getElementById(weapon.ids[weapon.type]).style.boxShadow = '0px 0px 10px 0px rgba(23,194,8,1)';
+
+    weapon.buttons.z = game.input.keyboard.addKey(Phaser.KeyCode.Z);
+    weapon.buttons.z.onDown.add(function () {
+        document.getElementById(weapon.ids[weapon.type]).style.boxShadow = '';
+        weapon.type = 0;
+        document.getElementById(weapon.ids[weapon.type]).style.boxShadow = '0px 0px 10px 0px rgba(23,194,8,1)';
+    }, this);
+    weapon.buttons.x = game.input.keyboard.addKey(Phaser.KeyCode.X);
+    weapon.buttons.x.onDown.add(function () {
+        document.getElementById(weapon.ids[weapon.type]).style.boxShadow = '';
+        weapon.type = 1;
+        document.getElementById(weapon.ids[weapon.type]).style.boxShadow = '0px 0px 10px 0px rgba(23,194,8,1)';
+    }, this);
+    weapon.buttons.c = game.input.keyboard.addKey(Phaser.KeyCode.C);
+    weapon.buttons.c.onDown.add(function () {
+        document.getElementById(weapon.ids[weapon.type]).style.boxShadow = '';
+        weapon.type = 2;
+        document.getElementById(weapon.ids[weapon.type]).style.boxShadow = '0px 0px 10px 0px rgba(23,194,8,1)';
+    }, this);
 
     weapon.sound = game.add.audio('shoot');
     weapon.sound.volume = 0.2;
@@ -337,15 +365,6 @@ function update() {
 
     if (weapon.fireButton.isDown) {
         weapon.fire();
-    }
-
-    if (weapon.changeButton.isDown) {
-        weapon.changeButtonDown = true;
-    }
-
-    if (weapon.changeButton.isUp && weapon.changeButtonDown) {
-        weapon.changeButtonDown = false;
-        weapon.type++;
     }
 
     if (volumeButton.isDown) {

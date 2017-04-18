@@ -40,6 +40,36 @@ h1 {
     margin-bottom: 50px;
 }
 
+.weapon {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    margin-left: 7.5px;
+    float: left;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    margin-bottom: 40px;
+}
+
+.single {
+    background: url('../assets/single_shoot_button.png');
+}
+
+.double {
+    background: url('../assets/double_shoot_button.png');
+}
+
+.big {
+    background: url('../assets/big_shoot_button.png');
+}
+
+.weapon div {
+    position: absolute;
+    bottom: -30px;
+    left: 15px;
+    font-size: 15px;
+}
+
 .keys {
 	color: #2f7efc;
 	margin-top: 20px;
