@@ -177,7 +177,7 @@ player.right = false;
 
 
 function update() {
-    if (score >= 2000) {
+    if (score >= 1000) {
         stage = 2;
     }
     rocks.forEachAlive(function(i) {i.body.x = i.startPointX + Math.sin(i.body.y * 3.14 / 180) * 10 * game.time.elapsedSince(gameStartTime)/30000})
