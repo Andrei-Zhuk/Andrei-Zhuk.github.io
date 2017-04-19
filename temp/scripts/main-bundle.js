@@ -93,12 +93,14 @@ function preload() {
     game.load.audio('shoot', 'assets/shoot-5.wav');
     game.load.audio('explosion_sound', 'assets/explosion-4.wav');
     game.load.audio('player_explosion_sound', 'assets/explosion2.wav');
-    game.load.spritesheet('volume', 'assets/volume_sprite.png', 30, 30);
+    game.load.spritesheet('volume', 'assets/volume_sprite1.png', 30, 30);
+    game.load.spritesheet('pause', 'assets/pause_sprite.png', 30, 30);
     game.load.image('double', 'assets/double.png');
+    game.load.image('repair', 'assets/repair.png');
     game.load.audio('double', 'assets/double_sound.wav');
 }
 
-var player, background, currentFrame, weapon, rocks, rock, explosions, explosion, explosionSound, scoreText, score, bestScore, stateText, gameStartTime, backgroundTheme, volume, volumeButton, volumeMute, gameIsOn, startText, timer, doubles, doublePic, doubleTimer, doubleSound, index, tween, aliens, cursors, stage;
+var player, background, currentFrame, weapon, rocks, rock, explosions, explosion, explosionSound, scoreText, score, bestScore, stateText, gameStartTime, backgroundTheme, volume, volumeButton, volumeMute, gameIsOn, startText, timer, doubles, doublePic, doubleTimer, doubleSound, index, tween, aliens, cursors, stage, pause, repair;
 score = 0;
 volumeMute = {
     pressed: false,
@@ -118,6 +120,8 @@ aliens.scouts = {};
 aliens.bombers = {};
 aliens.boss = {};
 stage = 1;
+pause = {};
+repair = {};
 
 function create() {
     bestScore = document.getElementById('best-score');
@@ -189,7 +193,6 @@ function create() {
     aliens.scouts.weapon.bulletAngleOffset = 90;
     aliens.scouts.weapon.enableBody = true;
     aliens.scouts.weapon.fireAngle = 90;
-    // aliens.scouts.weapon.onFire.add(a => weapon.sound.play())
 
     aliens.bombers.group = game.add.group();
     aliens.bombers.group.enableBody = true;
@@ -357,8 +360,19 @@ function create() {
 
     volume = game.add.sprite(game.world.width - 40, 10, 'volume');
     volume.frame = 1;
-
     volumeButton = game.input.keyboard.addKey(Phaser.KeyCode.M);
+
+    pause.button = game.input.keyboard.addKey(Phaser.KeyCode.P);
+    pause.sprite = game.add.sprite(game.world.width - 80, 10, 'pause');
+    pause.sprite.frame = 0;
+    pause.button.onDown.add(function () {
+        pause.sprite.frame = pause.sprite.frame + 1 == 2 ? 0 : 1;
+        if (pause.sprite.frame == 0) {
+            game.paused = false;
+        } else {
+            game.paused = true;
+        }
+    });
 
     player.part1.kill();
     player.part2.kill();
@@ -367,6 +381,13 @@ function create() {
     startText.anchor.setTo(0.5, 0.5);
     startText.text = "Click to start";
     game.input.onTap.addOnce(start, this);
+
+    repair.timer = game.time.create(false);
+    repair.timer.loop(50000 + Math.random() * 10000, repair.create, this);
+    repair.group = game.add.group();
+    repair.group.enableBody = true;
+    repair.group.physicsBodyType = Phaser.Physics.ARCADE;
+    repair.sound = game.add.audio('double');
 
     timer = game.time.create(false);
     timer.loop(20000 + Math.random() * 10000, double, this);
@@ -540,6 +561,8 @@ function update() {
     game.physics.arcade.overlap(player.part2, rocks, deathMaker, null, this);
     game.physics.arcade.overlap(player.part1, doubles, doubleEvent, null, this);
     game.physics.arcade.overlap(player.part2, doubles, doubleEvent, null, this);
+    game.physics.arcade.overlap(player.part1, repair.group, repair.event, null, this);
+    game.physics.arcade.overlap(player.part2, repair.group, repair.event, null, this);
 
     game.physics.arcade.overlap(weapon.single.bullets, [aliens.scouts.group, aliens.bombers.group], alienBulletHit, null, this);
     game.physics.arcade.overlap(weapon.double.part1.bullets, [aliens.scouts.group, aliens.bombers.group], alienBulletHit, null, this);
@@ -616,6 +639,7 @@ function deathMaker(plr, rock) {
         stateText.visible = true;
 
         timer.stop();
+        repair.timer.stop();
         gameIsOn = false;
 
         game.input.onTap.addOnce(restart, this);
@@ -659,6 +683,8 @@ function restart() {
     };
     timer.loop(20000 + Math.random() * 10000, double, this);
     timer.start();
+    repair.timer.loop(50000 + Math.random() * 10000, repair.create, this);
+    repair.timer.start();
     gameIsOn = true;
     stage = 1;
 }
@@ -681,12 +707,26 @@ function start() {
     player.part2.revive();
     backgroundTheme.play();
     timer.start();
+    repair.timer.start();
 }
 
 function double() {
     doublePic = doubles.create(40 + Math.random() * (game.width - 80), -48, 'double');
     doublePic.body.velocity.y = 200;
 }
+
+repair.create = function () {
+    repair.single = repair.group.create(40 + Math.random() * (game.width - 80), -48, 'repair');
+    repair.single.body.velocity.y = 200;
+};
+
+repair.event = function (plr, repair) {
+    if (player.lifes < 3) {
+        player.lifes++;
+        player.health.style.backgroundPositionX = -140 * player.lifes + 'px';
+        repair.kill();
+    }
+};
 
 function doubleEvent(plr, doublePic) {
     doublePic.kill();
@@ -738,6 +778,7 @@ function bulletHitPlayer(plr, bullet) {
         stateText.visible = true;
 
         timer.stop();
+        repair.timer.stop();
         gameIsOn = false;
 
         game.input.onTap.addOnce(restart, this);
