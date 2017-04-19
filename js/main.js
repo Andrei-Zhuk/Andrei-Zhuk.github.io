@@ -116,7 +116,7 @@ function create() {
     aliens.bombers.group.enableBody = true;
     aliens.bombers.group.physicsBodyType = Phaser.Physics.ARCADE;
     aliens.bombers.reloadTime = 4000;
-    aliens.bombers.rate = 0.996;
+    aliens.bombers.rate = 0.994;
 
     aliens.bombers.weapon = game.add.weapon(-1, 'alien-scout-bullet');
     aliens.bombers.weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
@@ -133,12 +133,12 @@ function create() {
     aliens.boss.reloadTime = 3000;
     aliens.boss.alive = false;
     aliens.boss.wasAlive = false;
-    aliens.boss.currentLifes = 30;
+    aliens.boss.currentLifes = 50;
     aliens.boss.part1.kill();
     aliens.boss.part2.kill();
 
     aliens.boss.tweens = {};
-    aliens.boss.tweens.start = game.add.tween(aliens.boss.part1).to( { y: 10 }, 5000, Phaser.Easing.Linear.None, false, 5000);
+    aliens.boss.tweens.start = game.add.tween(aliens.boss.part1).to( { y: 10 }, 2000, Phaser.Easing.Linear.None, false, 5000);
     aliens.boss.tweens.left = game.add.tween(aliens.boss.part1).to( { x: 100 }, 5000, Phaser.Easing.Linear.None, false);
     aliens.boss.tweens.cicle = game.add.tween(aliens.boss.part1).to( { x: game.world.width - 500 }, 10000, Phaser.Easing.Linear.None, false, 0, -1, true);
     aliens.boss.tweens.start.chain(aliens.boss.tweens.left);
@@ -318,7 +318,7 @@ function update() {
         aliens.boss.tweens.start.start();
     } else if (score >= 2000) {
         stage = 3;
-        aliens.scouts.rate = 0.99;
+        aliens.scouts.rate = 0.985;
     } else if (score >= 1000) {
         stage = 2;
         aliens.scouts.rate = 0.98;
@@ -371,7 +371,7 @@ function update() {
         }
     })
 
-    if (aliens.boss.alive) {
+    if (aliens.boss.alive && gameIsOn) {
         aliens.boss.part2.body.x = aliens.boss.part1.body.x + 135;
         aliens.boss.part2.body.y = aliens.boss.part1.body.y + 175;
 
@@ -627,9 +627,9 @@ function alienBulletHit(bullet, scout) {
         score += 20 * index;
         scoreText.text = 'Score: '+ score;
         explosionSound.play('', 0, 1);
-        explosion = explosions.create(scout.body.x, scout.body.y, 'explosion');
+        explosion = explosions.create(scout.body.x + scout.body.halfWidth, scout.body.y + scout.body.halfHeight, 'explosion');
         explosion.animations.add('boom')
-        explosion.anchor.setTo(0.1, 0.1)
+        explosion.anchor.setTo(0.5, 0.5)
         explosion.play('boom', 30, false, true)
     } else {
         explosion = explosions.create(bullet.body.x, bullet.body.y, 'explosion');
@@ -672,7 +672,7 @@ function bigBulletHitAlien(bullet, alien) {
     aliens.scouts.group.forEachAlive(function (i) {
         if (Math.sqrt(Math.pow((i.body.x - alien.body.x), 2) + Math.pow((i.body.y - alien.body.y), 2)) <= weapon.radius) {
             i.kill()
-            explosion = explosions.create(i.body.x, i.body.y, 'explosion');
+            explosion = explosions.create(i.body.x + i.body.halfWidth - 32 , i.body.y + i.body.halfHeight - 32, 'explosion');
             explosion.animations.add('boom');
             explosion.anchor.setTo(0.1, 0.1);
             explosion.play('boom', 30, false, true);
@@ -683,7 +683,7 @@ function bigBulletHitAlien(bullet, alien) {
     aliens.bombers.group.forEachAlive(function (i) {
         if (Math.sqrt(Math.pow((i.body.x - alien.body.x), 2) + Math.pow((i.body.y - alien.body.y), 2)) <= weapon.radius) {
             i.kill()
-            explosion = explosions.create(i.body.x, i.body.y, 'explosion');
+            explosion = explosions.create(i.body.x + i.body.halfWidth - 32 , i.body.y + i.body.halfHeight - 32, 'explosion');
             explosion.animations.add('boom');
             explosion.anchor.setTo(0.1, 0.1);
             explosion.play('boom', 30, false, true);
