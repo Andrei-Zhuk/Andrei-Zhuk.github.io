@@ -371,10 +371,10 @@ function update() {
         }
     })
 
-    if (aliens.boss.alive && gameIsOn) {
-        aliens.boss.part2.body.x = aliens.boss.part1.body.x + 135;
-        aliens.boss.part2.body.y = aliens.boss.part1.body.y + 175;
+    aliens.boss.part2.body.x = aliens.boss.part1.body.x + 135;
+    aliens.boss.part2.body.y = aliens.boss.part1.body.y + 175;
 
+    if (aliens.boss.alive && gameIsOn) {
         aliens.boss.weapon.straight1.fire();
         aliens.boss.weapon.straight2.fire();
         aliens.boss.weapon.straight3.fire();
@@ -554,6 +554,10 @@ function restart () {
     rocks.removeAll();
     aliens.scouts.group.removeAll();
     aliens.bombers.group.removeAll();
+    aliens.boss.part1.kill();
+    aliens.boss.part2.kill();
+    aliens.boss.wasAlive = false;
+    aliens.boss.alive = false;
 
     player.part1.revive();
     player.part2.revive();
@@ -713,14 +717,23 @@ function bulletHitBoss(boss, bullet) {
     if (aliens.boss.currentLifes === 0) {
         aliens.boss.part1.kill();
         aliens.boss.part2.kill();
+        for (var i = 1; i < 5; i++) {
+            explosion = explosions.create(aliens.boss.part1.body.x + 80 * i, aliens.boss.part1.body.y + 100, 'explosion');
+            explosion.animations.add('boom')
+            explosion.anchor.setTo(0.5, 0.5)
+            explosion.play('boom', 30, false, true)
+        }
+        explosion = explosions.create(bullet.body.x, bullet.body.y, 'explosion');
+        explosion.animations.add('boom');
+        explosion.anchor.setTo(0.5, 0.5);
+        explosion.scale.setTo(2, 2);
+        explosion.play('boom', 30, false, true)
+
         aliens.boss.alive = false;
         score += 500 * index;
         scoreText.text = 'Score: '+ score;
-        explosionSound.play('', 0, 1);
-        explosion = explosions.create(aliens.boss.part1.body.x, aliens.boss.part1.body.y, 'explosion');
-        explosion.animations.add('boom')
-        explosion.anchor.setTo(0.1, 0.1)
-        explosion.play('boom', 30, false, true)
+        explosionSound.play('', 0, 2);
+
     } else {
         explosion = explosions.create(bullet.body.x, bullet.body.y, 'explosion');
         explosion.animations.add('boom');
@@ -736,14 +749,23 @@ function bigBulletHitBoss(boss, bullet) {
     if (aliens.boss.currentLifes <= 0) {
         aliens.boss.part1.kill();
         aliens.boss.part2.kill();
+
+        for (var i = 1; i < 5; i++) {
+            explosion = explosions.create(aliens.boss.part1.body.x + 80 * i, aliens.boss.part1.body.y + 100, 'explosion');
+            explosion.animations.add('boom')
+            explosion.anchor.setTo(0.5, 0.5)
+            explosion.play('boom', 30, false, true)
+        }
+        explosion = explosions.create(bullet.body.x, bullet.body.y, 'explosion');
+        explosion.animations.add('boom');
+        explosion.anchor.setTo(0.5, 0.5);
+        explosion.scale.setTo(2, 2);
+        explosion.play('boom', 30, false, true)
+
         aliens.boss.alive = false;
         score += 500 * index;
         scoreText.text = 'Score: '+ score;
-        explosionSound.play('', 0, 1);
-        explosion = explosions.create(aliens.boss.part1.body.x, aliens.boss.part1.body.y, 'explosion');
-        explosion.animations.add('boom')
-        explosion.anchor.setTo(0.1, 0.1)
-        explosion.play('boom', 30, false, true)
+        explosionSound.play('', 0, 2);
     } else {
         explosion = explosions.create(bullet.body.x, bullet.body.y, 'explosion');
         explosion.animations.add('boom');
