@@ -101,6 +101,7 @@ function create() {
     aliens.scouts.group.enableBody = true;
     aliens.scouts.group.physicsBodyType = Phaser.Physics.ARCADE;
     aliens.scouts.reloadTime = 2000;
+    aliens.scouts.rate = 0.98;
 
     aliens.scouts.weapon = game.add.weapon(-1, 'alien-scout-bullet');
     aliens.scouts.weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
@@ -114,7 +115,8 @@ function create() {
     aliens.bombers.group = game.add.group();
     aliens.bombers.group.enableBody = true;
     aliens.bombers.group.physicsBodyType = Phaser.Physics.ARCADE;
-    aliens.bombers.reloadTime = 3000;
+    aliens.bombers.reloadTime = 4000;
+    aliens.bombers.rate = 0.998
 
     aliens.bombers.weapon = game.add.weapon(-1, 'alien-scout-bullet');
     aliens.bombers.weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
@@ -312,8 +314,10 @@ function update() {
         aliens.boss.tweens.start.start();
     } else if (score >= 2000) {
         stage = 3;
+        aliens.scouts.rate = 0.99;
     } else if (score >= 1000) {
         stage = 2;
+        aliens.scouts.rate = 0.98;
     } else {
         stage = 1
     }
@@ -325,7 +329,7 @@ function update() {
         rock.startPointX = rock.body.x;
     }
 
-    if ((Math.random() < 1 - 0.98) && gameIsOn && stage >= 2 && !aliens.boss.alive) {
+    if ((Math.random() < 1 - aliens.scouts.rate) && gameIsOn && stage >= 2 && !aliens.boss.alive) {
         aliens.scouts.single = aliens.scouts.group.create(50 + Math.random() * (game.width - 100), -100, 'alien-scout')
         aliens.scouts.single.body.velocity.y = 150;
         aliens.scouts.single.startTime = game.time.time;
@@ -342,7 +346,7 @@ function update() {
         }
     })
 
-    if ((Math.random() < 1 - 0.995) && gameIsOn && stage == 3 && !aliens.boss.alive) {
+    if ((Math.random() < 1 - aliens.bombers.rate) && gameIsOn && stage == 3 && !aliens.boss.alive) {
         aliens.bombers.single = aliens.bombers.group.create(70 + Math.random() * (game.width - 140), -62, 'alien-bomber')
         aliens.bombers.single.body.velocity.y = 80;
         aliens.bombers.single.startTime = game.time.time;
