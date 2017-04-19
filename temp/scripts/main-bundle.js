@@ -87,7 +87,9 @@ function preload() {
     game.load.image('rock', 'assets/rock.png');
     game.load.image('alien-scout', 'assets/alien-scout.png');
     game.load.image('alien-scout-bullet', 'assets/alien-scout-bullet.png');
-    game.load.image('alien-bomber', 'assets/alien-bomber.png');
+    game.load.image('alien-bomber', 'assets/alien-bomber2.png');
+    game.load.spritesheet('alien-boss_part1', 'assets/alien-boss_part1.png');
+    game.load.spritesheet('alien-boss_part2', 'assets/alien-boss_part2.png');
     game.load.audio('shoot', 'assets/shoot-5.wav');
     game.load.audio('explosion_sound', 'assets/explosion-4.wav');
     game.load.audio('player_explosion_sound', 'assets/explosion2.wav');
@@ -114,6 +116,7 @@ weapon.buttons = {};
 aliens = {};
 aliens.scouts = {};
 aliens.bombers = {};
+aliens.boss = {};
 stage = 1;
 
 function create() {
@@ -200,6 +203,87 @@ function create() {
     aliens.bombers.weapon.enableBody = true;
     aliens.bombers.weapon.fireAngle = 90;
 
+    aliens.boss.part1 = game.add.sprite(game.world.width / 2 - 199, -225, 'alien-boss_part1');
+    aliens.boss.part2 = game.add.sprite(game.world.width / 2 - 199, -50, 'alien-boss_part2');
+    game.physics.arcade.enable(aliens.boss.part1);
+    game.physics.arcade.enable(aliens.boss.part2);
+    aliens.boss.reloadTime = 3000;
+    aliens.boss.alive = false;
+    aliens.boss.wasAlive = false;
+    aliens.boss.currentLifes = 15;
+
+    aliens.boss.tweens = {};
+    aliens.boss.tweens.start = game.add.tween(aliens.boss.part1).to({ y: 10 }, 5000, Phaser.Easing.Linear.None, false, 5000);
+    aliens.boss.tweens.left = game.add.tween(aliens.boss.part1).to({ x: 100 }, 5000, Phaser.Easing.Linear.None, false);
+    aliens.boss.tweens.cicle = game.add.tween(aliens.boss.part1).to({ x: game.world.width - 500 }, 10000, Phaser.Easing.Linear.None, false, 0, -1, true);
+    aliens.boss.tweens.start.chain(aliens.boss.tweens.left);
+    aliens.boss.tweens.left.chain(aliens.boss.tweens.cicle);
+
+    aliens.boss.weapon = {};
+
+    aliens.boss.weapon.straight1 = game.add.weapon(-1, 'alien-scout-bullet');
+    aliens.boss.weapon.straight1.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
+    aliens.boss.weapon.straight1.bulletSpeed = 500;
+    aliens.boss.weapon.straight1.fireRate = 1500;
+    aliens.boss.weapon.straight1.bulletAngleOffset = 90;
+    aliens.boss.weapon.straight1.enableBody = true;
+    aliens.boss.weapon.straight1.fireAngle = 90;
+    aliens.boss.weapon.straight1.trackSprite(aliens.boss.part1, 82, 158);
+
+    aliens.boss.weapon.straight2 = game.add.weapon(-1, 'alien-scout-bullet');
+    aliens.boss.weapon.straight2.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
+    aliens.boss.weapon.straight2.bulletSpeed = 500;
+    aliens.boss.weapon.straight2.fireRate = 3500;
+    aliens.boss.weapon.straight2.bulletAngleOffset = 90;
+    aliens.boss.weapon.straight2.enableBody = true;
+    aliens.boss.weapon.straight2.fireAngle = 90;
+    aliens.boss.weapon.straight2.trackSprite(aliens.boss.part1, 164, 145);
+
+    aliens.boss.weapon.straight3 = game.add.weapon(-1, 'alien-scout-bullet');
+    aliens.boss.weapon.straight3.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
+    aliens.boss.weapon.straight3.bulletSpeed = 500;
+    aliens.boss.weapon.straight3.fireRate = 3500;
+    aliens.boss.weapon.straight3.bulletAngleOffset = 90;
+    aliens.boss.weapon.straight3.enableBody = true;
+    aliens.boss.weapon.straight3.fireAngle = 90;
+    aliens.boss.weapon.straight3.trackSprite(aliens.boss.part1, 234, 145);
+
+    aliens.boss.weapon.straight4 = game.add.weapon(-1, 'alien-scout-bullet');
+    aliens.boss.weapon.straight4.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
+    aliens.boss.weapon.straight4.bulletSpeed = 500;
+    aliens.boss.weapon.straight4.fireRate = 1500;
+    aliens.boss.weapon.straight4.bulletAngleOffset = 90;
+    aliens.boss.weapon.straight4.enableBody = true;
+    aliens.boss.weapon.straight4.fireAngle = 90;
+    aliens.boss.weapon.straight4.trackSprite(aliens.boss.part1, 315, 158);
+
+    aliens.boss.weapon.side1 = game.add.weapon(-1, 'alien-scout-bullet');
+    aliens.boss.weapon.side1.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
+    aliens.boss.weapon.side1.bulletSpeed = 500;
+    aliens.boss.weapon.side1.fireRate = 4500;
+    aliens.boss.weapon.side1.bulletAngleOffset = 90;
+    aliens.boss.weapon.side1.enableBody = true;
+    aliens.boss.weapon.side1.fireAngle = 60;
+    aliens.boss.weapon.side1.trackSprite(aliens.boss.part1, 101, 154);
+
+    aliens.boss.weapon.side2 = game.add.weapon(-1, 'alien-scout-bullet');
+    aliens.boss.weapon.side2.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
+    aliens.boss.weapon.side2.bulletSpeed = 500;
+    aliens.boss.weapon.side2.fireRate = 4500;
+    aliens.boss.weapon.side2.bulletAngleOffset = 90;
+    aliens.boss.weapon.side2.enableBody = true;
+    aliens.boss.weapon.side2.fireAngle = 120;
+    aliens.boss.weapon.side2.trackSprite(aliens.boss.part1, 296, 154);
+
+    aliens.boss.weapon.target = game.add.weapon(-1, 'alien-scout-bullet');
+    aliens.boss.weapon.target.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
+    aliens.boss.weapon.target.bulletSpeed = 500;
+    aliens.boss.weapon.target.fireRate = 6500;
+    aliens.boss.weapon.target.bulletAngleOffset = 90;
+    aliens.boss.weapon.target.enableBody = true;
+    aliens.boss.weapon.target.fireAngle = 120;
+    aliens.boss.weapon.target.trackSprite(aliens.boss.part2, 64, 50);
+
     player.part1 = game.add.sprite(80, game.world.height - 150, 'player');
     weapon.single.trackSprite(player.part1, 12, 0);
     weapon.double.part1.trackSprite(player.part1, 12, 0);
@@ -263,7 +347,7 @@ function create() {
 
     scoreText = game.add.text(10, 10, 'Score: ' + score, { font: '24px Arial', fill: '#fff' });
 
-    stateText = game.add.text(game.world.centerX, game.world.centerY, ' ', { font: '84px Arial', fill: '#fff' });
+    stateText = game.add.text(game.world.centerX, game.world.centerY, ' ', { font: '64px Arial', fill: '#fff' });
     stateText.anchor.setTo(0.5, 0.5);
     stateText.visible = false;
 
@@ -275,7 +359,7 @@ function create() {
     player.part1.kill();
     player.part2.kill();
     weapon.fire = function () {};
-    startText = game.add.text(game.world.centerX, game.world.centerY, ' ', { font: '84px Arial', fill: '#fff' });
+    startText = game.add.text(game.world.centerX, game.world.centerY, ' ', { font: '64px Arial', fill: '#fff' });
     startText.anchor.setTo(0.5, 0.5);
     startText.text = "Click to start";
     game.input.onTap.addOnce(start, this);
@@ -300,9 +384,14 @@ player.left = false;
 player.right = false;
 
 function update() {
-    if (score >= 3000) {
-        stage = 3;
+
+    if (score >= 3000 && !aliens.boss.wasAlive) {
+        aliens.boss.wasAlive = true;
+        aliens.boss.alive = true;
+        aliens.boss.tweens.start.start();
     } else if (score >= 2000) {
+        stage = 3;
+    } else if (score >= 1000) {
         stage = 2;
     } else {
         stage = 1;
@@ -317,7 +406,7 @@ function update() {
         rock.startPointX = rock.body.x;
     }
 
-    if (Math.random() < 1 - 0.98 && gameIsOn && stage >= 2) {
+    if (Math.random() < 1 - 0.98 && gameIsOn && stage >= 2 && !aliens.boss.alive) {
         aliens.scouts.single = aliens.scouts.group.create(50 + Math.random() * (game.width - 100), -100, 'alien-scout');
         aliens.scouts.single.body.velocity.y = 150;
         aliens.scouts.single.startTime = game.time.time;
@@ -334,7 +423,7 @@ function update() {
         }
     });
 
-    if (Math.random() < 1 - 0.99 && gameIsOn && stage == 3) {
+    if (Math.random() < 1 - 0.995 && gameIsOn && stage == 3 && !aliens.boss.alive) {
         aliens.bombers.single = aliens.bombers.group.create(70 + Math.random() * (game.width - 140), -62, 'alien-bomber');
         aliens.bombers.single.body.velocity.y = 80;
         aliens.bombers.single.startTime = game.time.time;
@@ -343,7 +432,7 @@ function update() {
     }
 
     aliens.bombers.group.forEachAlive(function (i) {
-        if (i.body.y >= game.height + 62) {
+        if (i.body.y >= game.height) {
             i.kill();
         } else if (game.time.elapsedSince(i.startTime) >= aliens.bombers.reloadTime && gameIsOn) {
             i.startTime = game.time.time;
@@ -354,6 +443,19 @@ function update() {
             i.body.x = i.startPointX + Math.sin(i.body.y * 3.14 / 180) * 40;
         }
     });
+
+    if (aliens.boss.alive) {
+        aliens.boss.part2.body.x = aliens.boss.part1.body.x + 135;
+        aliens.boss.part2.body.y = aliens.boss.part1.body.y + 175;
+
+        aliens.boss.weapon.straight1.fire();
+        aliens.boss.weapon.straight2.fire();
+        aliens.boss.weapon.straight3.fire();
+        aliens.boss.weapon.straight4.fire();
+        aliens.boss.weapon.side1.fire();
+        aliens.boss.weapon.side2.fire();
+        aliens.boss.weapon.target.fireAtSprite(player.part1);
+    }
 
     background.tilePosition.y += 2;
 
@@ -436,8 +538,13 @@ function update() {
     game.physics.arcade.overlap(weapon.double.part2.bullets, [aliens.scouts.group, aliens.bombers.group], alienBulletHit, null, this);
     game.physics.arcade.overlap(weapon.big.bullets, [aliens.scouts.group, aliens.bombers.group], bigBulletHitAlien, null, this);
 
-    game.physics.arcade.overlap(player.part1, [aliens.scouts.weapon.bullets, aliens.bombers.weapon.bullets], bulletHitPlayer, null, this);
-    game.physics.arcade.overlap(player.part2, [aliens.scouts.weapon.bullets, aliens.bombers.weapon.bullets], bulletHitPlayer, null, this);
+    game.physics.arcade.overlap(weapon.single.bullets, [aliens.boss.part1, aliens.boss.part2], bulletHitBoss, null, this);
+    game.physics.arcade.overlap(weapon.double.part1.bullets, [aliens.boss.part1, aliens.boss.part2], bulletHitBoss, null, this);
+    game.physics.arcade.overlap(weapon.double.part2.bullets, [aliens.boss.part1, aliens.boss.part2], bulletHitBoss, null, this);
+    game.physics.arcade.overlap(weapon.big.bullets, [aliens.boss.part1, aliens.boss.part2], bigBulletHitBoss, null, this);
+
+    game.physics.arcade.overlap(player.part1, [aliens.scouts.weapon.bullets, aliens.bombers.weapon.bullets, aliens.boss.weapon.straight1.bullets, aliens.boss.weapon.straight2.bullets, aliens.boss.weapon.straight3.bullets, aliens.boss.weapon.straight4.bullets, aliens.boss.weapon.side1.bullets, aliens.boss.weapon.side2.bullets, aliens.boss.weapon.target.bullets], bulletHitPlayer, null, this);
+    game.physics.arcade.overlap(player.part2, [aliens.scouts.weapon.bullets, aliens.bombers.weapon.bullets, aliens.boss.weapon.straight1.bullets, aliens.boss.weapon.straight2.bullets, aliens.boss.weapon.straight3.bullets, aliens.boss.weapon.straight4.bullets, aliens.boss.weapon.side1.bullets, aliens.boss.weapon.side2.bullets, aliens.boss.weapon.target.bullets], bulletHitPlayer, null, this);
 
     game.physics.arcade.overlap(player.part1, [aliens.scouts.group, aliens.bombers.group], deathMaker, null, this);
     game.physics.arcade.overlap(player.part2, [aliens.scouts.group, aliens.bombers.group], deathMaker, null, this);
@@ -649,9 +756,64 @@ function bigBulletHitAlien(bullet, alien) {
     });
 
     bullet.kill();
-    alien.kill();
-    explosionSound.play();
+    alien.currentLifes -= 3;
+    if (alien.currentLifes <= 0) {
+        alien.kill();
+        explosionSound.play();
+    } else {
+        explosion = explosions.create(bullet.body.x, bullet.body.y, 'explosion');
+        explosion.animations.add('boom');
+        explosion.scale.setTo(0.5, 0.5);
+        explosion.play('boom', 30, false, true);
+        explosionSound.play('', 0, 0.3);
+    }
     scoreText.text = 'Score: ' + score;
+}
+
+function bulletHitBoss(boss, bullet) {
+    bullet.kill();
+    aliens.boss.currentLifes--;
+    if (aliens.boss.currentLifes === 0) {
+        aliens.boss.part1.kill();
+        aliens.boss.part2.kill();
+        aliens.boss.alive = false;
+        score += 500 * index;
+        scoreText.text = 'Score: ' + score;
+        explosionSound.play('', 0, 1);
+        explosion = explosions.create(aliens.boss.part1.body.x, aliens.boss.part1.body.y, 'explosion');
+        explosion.animations.add('boom');
+        explosion.anchor.setTo(0.1, 0.1);
+        explosion.play('boom', 30, false, true);
+    } else {
+        explosion = explosions.create(bullet.body.x, bullet.body.y, 'explosion');
+        explosion.animations.add('boom');
+        explosion.scale.setTo(0.5, 0.5);
+        explosion.play('boom', 30, false, true);
+        explosionSound.play('', 0, 0.3);
+    }
+}
+
+function bigBulletHitBoss(boss, bullet) {
+    bullet.kill();
+    aliens.boss.currentLifes -= 3;
+    if (aliens.boss.currentLifes <= 0) {
+        aliens.boss.part1.kill();
+        aliens.boss.part2.kill();
+        aliens.boss.alive = false;
+        score += 500 * index;
+        scoreText.text = 'Score: ' + score;
+        explosionSound.play('', 0, 1);
+        explosion = explosions.create(aliens.boss.part1.body.x, aliens.boss.part1.body.y, 'explosion');
+        explosion.animations.add('boom');
+        explosion.anchor.setTo(0.1, 0.1);
+        explosion.play('boom', 30, false, true);
+    } else {
+        explosion = explosions.create(bullet.body.x, bullet.body.y, 'explosion');
+        explosion.animations.add('boom');
+        explosion.scale.setTo(0.5, 0.5);
+        explosion.play('boom', 30, false, true);
+        explosionSound.play('', 0, 0.3);
+    }
 }
 
 /***/ })
