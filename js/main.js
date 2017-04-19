@@ -116,7 +116,7 @@ function create() {
     aliens.bombers.group.enableBody = true;
     aliens.bombers.group.physicsBodyType = Phaser.Physics.ARCADE;
     aliens.bombers.reloadTime = 4000;
-    aliens.bombers.rate = 0.998
+    aliens.bombers.rate = 0.996;
 
     aliens.bombers.weapon = game.add.weapon(-1, 'alien-scout-bullet');
     aliens.bombers.weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
@@ -133,7 +133,9 @@ function create() {
     aliens.boss.reloadTime = 3000;
     aliens.boss.alive = false;
     aliens.boss.wasAlive = false;
-    aliens.boss.currentLifes = 15;
+    aliens.boss.currentLifes = 30;
+    aliens.boss.part1.kill();
+    aliens.boss.part2.kill();
 
     aliens.boss.tweens = {};
     aliens.boss.tweens.start = game.add.tween(aliens.boss.part1).to( { y: 10 }, 5000, Phaser.Easing.Linear.None, false, 5000);
@@ -311,6 +313,8 @@ function update() {
     if (score >= 3000 && !aliens.boss.wasAlive) {
         aliens.boss.wasAlive = true;
         aliens.boss.alive = true;
+        aliens.boss.part1.revive();
+        aliens.boss.part2.revive();
         aliens.boss.tweens.start.start();
     } else if (score >= 2000) {
         stage = 3;
